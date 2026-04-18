@@ -16,7 +16,7 @@ const PublicHeader = () => {
             className="h-8 w-8 object-contain"
           />
 
-          <h1 className="font-display text-xs sm:text-sm md:text-lg font-semibold text-brand-900 leading-tight">
+          <h1 className="font-display text-sm sm:text-xl md:text-2xl font-semibold text-brand-900 leading-tight whitespace-nowrap">
             New Shining Star Public School
           </h1>
         </div>
@@ -33,8 +33,11 @@ const PublicHeader = () => {
         <div className="flex items-center gap-3">
 
           {/* ADMIN (ONLY DESKTOP) */}
-          <a href="/admin" className="hidden lg:block btn-primary text-sm px-4 py-2">
-            Admin
+          <a 
+            href="/admin" 
+            className="!hidden lg:!block btn-primary text-sm px-4 py-2"
+            >
+              Admin
           </a>
 
           {/* MOBILE TOGGLE */}
