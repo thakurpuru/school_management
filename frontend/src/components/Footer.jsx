@@ -42,7 +42,7 @@ const Footer = () => (
             <i className="fa-brands fa-facebook fa-2x" style={{color: "rgb(26, 97, 223)",}}></i>
             {/* <FontAwesomeIcon icon={byPrefixAndName.fab['facebook']} style={{color: "rgb(26, 97, 223)",}} /> */}
           </a>
-          <a href="#" className="hover:scale-110 transition">
+          <a href="https://www.instagram.com/nssps_school/" className="hover:scale-110 transition">
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" className="h-8 w-8" />
           </a>
           <a href="#" className="hover:scale-110 transition">

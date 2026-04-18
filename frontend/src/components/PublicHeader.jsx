@@ -9,14 +9,14 @@ const PublicHeader = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
 
         {/* LEFT: LOGO + NAME */}
-        <div className="flex items-center gap-2 max-w-[70%]">
+        <div className="flex items-center gap-2 min-w-0">
           <img
-            src="/school-logo.PNG"
+            src="/logo.jpg"
             alt="logo"
-            className="h-8 w-8 object-contain"
+            className="h-12 w-12 object-contain flex-shrink-0"
           />
 
-          <h1 className="font-display text-sm sm:text-xl md:text-2xl font-semibold text-brand-900 leading-tight whitespace-nowrap">
+          <h1 className="font-display text-[0.95rem] sm:text-[1.5rem] font-semibold text-brand-900 leading-tight">
             New Shining Star Public School
           </h1>
         </div>

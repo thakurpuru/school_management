@@ -123,16 +123,18 @@ const HomePage = () => (
         {[
           "/g1.jpg",
           "/g2.jpg",
-          "/g3.jpg",
+          "/logo.jpg",
           "/g4.jpg",
           "/g5.jpg",
           "/g6.jpg",
         ].map((img, index) => (
-          <div key={index} className="overflow-hidden rounded-2xl shadow">
+          <div key={index} className="overflow-hidden rounded-2xl shadow bg-white">
             <img
               src={img}
               alt="gallery"
-              className="h-64 w-full object-cover transition hover:scale-110"
+              className={`h-64 w-full transition hover:scale-110 ${
+                img === "/logo.jpg" ? "object-contain p-4" : "object-cover"
+              }`}
             />
           </div>
         ))}
