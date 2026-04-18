@@ -51,7 +51,7 @@ const HomePage = () => (
         {/* Chairman */}
         <div className="panel p-6 text-center">
           <img
-            src="/chairman.jpg"
+            src="/santosh.jpeg"
             className="mx-auto h-40 w-40 rounded-full object-cover"
           />
           <h4 className="mt-4 text-2xl font-display text-brand-900">
@@ -70,7 +70,7 @@ const HomePage = () => (
             className="mx-auto h-40 w-40 rounded-full object-cover"
           />
           <h4 className="mt-4 text-2xl font-display text-brand-900">
-            Dr. Priya Sharma
+            Mr. Vineet Kumar Jha
           </h4>
           <p className="text-sm text-accent-600">Principal</p>
           <p className="mt-3 text-brand-700">
@@ -124,9 +124,14 @@ const HomePage = () => (
           "/g1.jpg",
           "/g2.jpg",
           "/logo.jpg",
-          "/g4.jpg",
-          "/g5.jpg",
-          "/g6.jpg",
+          "/g4.jpeg",
+          "/g3.jpeg",
+          "/g5.jpeg",
+          "/g6.jpeg",
+          "/g7.jpeg",
+          "/g8.jpeg",
+          "/g9.jpeg",
+          "/g10.jpeg",
         ].map((img, index) => (
           <div key={index} className="overflow-hidden rounded-2xl shadow bg-white">
             <img
