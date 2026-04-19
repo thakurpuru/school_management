@@ -30,7 +30,7 @@ const Footer = () => (
       <div>
         <h4 className="text-lg font-semibold">Contact</h4>
         <p className="mt-3 text-sm text-white/80">📞 +91 73679 87022</p>
-        <p className="text-sm text-white/80">📧 admin@school.com</p>
+        <p className="text-sm text-white/80">📧 nssps7022@gmail.com</p>
       </div>
 
       {/* SOCIAL LINKS */}
@@ -38,7 +38,7 @@ const Footer = () => (
         <h4 className="text-lg font-semibold">Follow Us</h4>
 
         <div className="mt-4 flex gap-4">
-          <a href="#" className="hover:scale-110 transition">
+          <a href="https://www.facebook.com/100083539384224/videos/n-s-s-p-sashapur/2011815695971626/" className="hover:scale-110 transition">
             <i className="fa-brands fa-facebook fa-2x" style={{color: "rgb(26, 97, 223)",}}></i>
             {/* <FontAwesomeIcon icon={byPrefixAndName.fab['facebook']} style={{color: "rgb(26, 97, 223)",}} /> */}
           </a>
@@ -48,7 +48,7 @@ const Footer = () => (
           <a href="#" className="hover:scale-110 transition">
             <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/twitter-app-icon.png" className="h-8 w-8" />
           </a>
-          <a href="#" className="hover:scale-110 transition">
+          <a href="https://www.youtube.com/@n.s.s.p.s.ashapurdarbhanga732" className="hover:scale-110 transition">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFnwPrWc5l184PBpOdmaRVZsFdtEUvyNz32g&s" className="h-8 w-8" />
           </a>
         </div>
