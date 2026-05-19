@@ -14,11 +14,14 @@ const ensureDirectory = (folderName) => {
 };
 
 const schoolConfig = () => ({
-  name: process.env.SCHOOL_NAME || "Green Valley Public School",
+  name: process.env.SCHOOL_NAME || "New Shining Star Public School",
   address:
-    process.env.SCHOOL_ADDRESS || "Near Main Road, Your City, State - 123456",
-  phone: process.env.SCHOOL_PHONE || "+91-9876543210",
-  headName: process.env.SCHOOL_HEAD_NAME || "School Head"
+    process.env.SCHOOL_ADDRESS ||
+    "Ashapur - Bahera Rd, Ashapur, Darbhanga, Bihar - 847201",
+  phone: process.env.SCHOOL_PHONE || "+91 73679 87022",
+  email: process.env.SCHOOL_EMAIL || "nssps7022@gmail.com",
+  headName: process.env.SCHOOL_HEAD_NAME || "Shri Santosh Jha",
+  principalName: process.env.SCHOOL_PRINCIPAL_NAME || "Mr. Vineet Kumar Jha"
 });
 
 const drawTableHeader = (doc, y, headers) => {
@@ -79,6 +82,7 @@ export const createFeeReceiptPdf = ({ student, fee }) =>
     doc.fontSize(18).text(school.name, { align: "center" });
     doc.fontSize(10).text(school.address, { align: "center" });
     doc.text(`Contact: ${school.phone}`, { align: "center" });
+    doc.text(`Email: ${school.email}`, { align: "center" });
     doc.moveDown();
     doc.fontSize(14).text("Fee Receipt", { align: "center", underline: true });
     doc.moveDown();
@@ -90,6 +94,8 @@ export const createFeeReceiptPdf = ({ student, fee }) =>
     doc.text(
       `Class / Course: ${student.academicDetails.className} - ${student.academicDetails.section}`
     );
+    doc.text(`Aadhar Number: ${student.personalDetails.aadharNumber}`);
+    doc.text(`Facility Type: ${student.facilityType || "none"}`);
     if (fee.monthLabel) {
       doc.text(`Month: ${fee.monthLabel}`);
     }
@@ -124,6 +130,10 @@ export const createFeeReceiptPdf = ({ student, fee }) =>
     y += 24;
     doc.text("Paid By: Cash", 55, y);
     y += 36;
+    doc.text(`Chairman: ${school.headName}`, 55, y);
+    y += 20;
+    doc.text(`Principal: ${school.principalName}`, 55, y);
+    y += 24;
     doc.text(`Signature: ____________________ (${school.headName})`, 55, y);
     y += 40;
     doc.fontSize(10).text("Amount once paid is non-refundable", 55, y);
@@ -148,6 +158,8 @@ export const createSalarySlipPdf = ({ employee, salary }) =>
 
     doc.fontSize(18).text(school.name, { align: "center" });
     doc.fontSize(10).text(school.address, { align: "center" });
+    doc.text(`Contact: ${school.phone}`, { align: "center" });
+    doc.text(`Email: ${school.email}`, { align: "center" });
     doc.moveDown();
     doc.fontSize(14).text("Salary Slip", { align: "center", underline: true });
     doc.moveDown();
@@ -188,6 +200,7 @@ export const createDueReportPdf = ({ title, rows }) =>
     doc.fontSize(18).text(school.name, { align: "center" });
     doc.fontSize(10).text(school.address, { align: "center" });
     doc.text(`Contact: ${school.phone}`, { align: "center" });
+    doc.text(`Email: ${school.email}`, { align: "center" });
     doc.moveDown();
     doc.fontSize(14).text(title, { align: "center", underline: true });
     doc.moveDown();

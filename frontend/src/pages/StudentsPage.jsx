@@ -1,4 +1,5 @@
 import { startTransition, useDeferredValue, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { apiRequest, getAssetUrl } from "../api/client.js";
 import PageHeader from "../components/PageHeader.jsx";
 import { toast } from "react-toastify";
@@ -32,7 +33,9 @@ const initialForm = {
 
 const isValidAadhar = (value = "") => /^\d{12}$/.test(String(value).trim());
 
-const StudentsPage = () => {
+const StudentsPage = ({ mode = "list" }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [feeHistory, setFeeHistory] = useState([]);
@@ -57,6 +60,37 @@ const StudentsPage = () => {
   useEffect(() => {
     loadStudents(deferredSearch);
   }, [deferredSearch]);
+
+  useEffect(() => {
+    if (mode !== "form") {
+      return;
+    }
+
+    const editingStudent = location.state?.editingStudent;
+
+    if (!editingStudent) {
+      setEditingId(null);
+      return;
+    }
+
+    setEditingId(editingStudent._id);
+    setForm({
+      personalDetails: editingStudent.personalDetails,
+      academicDetails: {
+        ...editingStudent.academicDetails,
+        admissionDate: editingStudent.academicDetails.admissionDate?.slice(0, 10)
+      },
+      contactDetails: editingStudent.contactDetails,
+      facilityType: editingStudent.facilityType || "none",
+      feeSummary: {
+        admissionFee: editingStudent.feeSummary.admissionFee,
+        tuitionFee: editingStudent.feeSummary.tuitionFee,
+        transportFee: editingStudent.feeSummary.transportFee,
+        hostelFee: editingStudent.feeSummary.hostelFee,
+        otherCharges: editingStudent.feeSummary.otherCharges
+      }
+    });
+  }, [location.state, mode]);
 
   const handleNestedChange = (group, field, value) => {
     setForm((current) => ({
@@ -126,6 +160,7 @@ const StudentsPage = () => {
         editingId ? "Student updated successfully" : "Student added successfully"
       );
       resetForm();
+      navigate("/admin/students/list");
       await loadStudents(deferredSearch);
     } catch (error) {
       toast.error(error.message || "All fields are required");
@@ -133,22 +168,8 @@ const StudentsPage = () => {
   };
 
   const handleEdit = (student) => {
-    setEditingId(student._id);
-    setForm({
-      personalDetails: student.personalDetails,
-      academicDetails: {
-        ...student.academicDetails,
-        admissionDate: student.academicDetails.admissionDate?.slice(0, 10)
-      },
-      contactDetails: student.contactDetails,
-      facilityType: student.facilityType || "none",
-      feeSummary: {
-        admissionFee: student.feeSummary.admissionFee,
-        tuitionFee: student.feeSummary.tuitionFee,
-        transportFee: student.feeSummary.transportFee,
-        hostelFee: student.feeSummary.hostelFee,
-        otherCharges: student.feeSummary.otherCharges
-      }
+    navigate("/admin/students/add", {
+      state: { editingStudent: student }
     });
   };
 
@@ -189,94 +210,166 @@ const StudentsPage = () => {
   return (
     <div>
       <PageHeader
-        title="Students"
-        description="Maintain personal, academic, contact, and admission fee details in a clean student register."
+        title={mode === "form" ? (editingId ? "Update Student" : "Add Student") : "Student List"}
+        description={
+          mode === "form"
+            ? "Create or update a full student profile with academic, contact, facility, and fee details."
+            : "Search students, review their dues, and open full details from one clean register."
+        }
         action={
-          <button type="button" className="btn-secondary" onClick={handleAutoUpgrade}>
-            Run Yearly Upgrade
-          </button>
+          mode === "list" ? (
+            <button type="button" className="btn-secondary" onClick={handleAutoUpgrade}>
+              Run Yearly Upgrade
+            </button>
+          ) : null
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <section className="panel p-6">
-          <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h3 className="font-display text-2xl text-brand-900">Student List</h3>
-            <input
-              className="input max-w-sm"
-              placeholder="Search by name, Aadhar, phone, or ID"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-            />
-          </div>
+      {mode === "list" ? (
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <section className="space-y-6">
+            <div className="panel p-6">
+              <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <h3 className="font-display text-2xl text-brand-900">Student List</h3>
+                <input
+                  className="input max-w-sm"
+                  placeholder="Search by name, Aadhar, phone, or ID"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                />
+              </div>
 
-          <div className="table-wrap">
-            <table className="table-base">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Class</th>
-                  <th>Total Due</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.length ? (
-                  students.map((student) => (
-                    <tr key={student._id} className="border-t border-brand-50">
-                      <td>{student.studentId}</td>
-                      <td>{student.personalDetails.studentName}</td>
-                      <td>
-                        {student.academicDetails.className} - {student.academicDetails.section}
-                      </td>
-                      <td>{formatCurrency(student.feeSummary.totalDue)}</td>
-                      <td>
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            className="btn-secondary px-3 py-2"
-                            onClick={() => loadStudentDetails(student._id)}
-                          >
-                            View
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-secondary px-3 py-2"
-                            onClick={() => handleEdit(student)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-danger"
-                            onClick={() => handleDelete(student._id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+              <div className="table-wrap">
+                <table className="table-base">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Class</th>
+                      <th>Total Due</th>
+                      <th>Actions</th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="px-4 py-6 text-center text-brand-700">
-                      No students found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                  </thead>
+                  <tbody>
+                    {students.length ? (
+                      students.map((student) => (
+                        <tr key={student._id} className="border-t border-brand-50">
+                          <td>{student.studentId}</td>
+                          <td>{student.personalDetails.studentName}</td>
+                          <td>
+                            {student.academicDetails.className} - {student.academicDetails.section}
+                          </td>
+                          <td>{formatCurrency(student.feeSummary.totalDue)}</td>
+                          <td>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                className="btn-secondary px-3 py-2"
+                                onClick={() => loadStudentDetails(student._id)}
+                              >
+                                View
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-secondary px-3 py-2"
+                                onClick={() => handleEdit(student)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-danger"
+                                onClick={() => handleDelete(student._id)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="px-4 py-6 text-center text-brand-700">
+                          No students found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-        <section className="space-y-6">
-          <div className="panel p-6">
-            <h3 className="font-display text-2xl text-brand-900">
-              {editingId ? "Update Student" : "Add Student"}
-            </h3>
-            <form className="mt-5 space-y-6" onSubmit={handleSubmit}>
-              <div>
+            <div className="panel p-6">
+              <h3 className="font-display text-2xl text-brand-900">Student Details</h3>
+              {selectedStudent ? (
+                <div className="mt-5 space-y-4 text-sm text-brand-700">
+                  <div>
+                    <p className="font-semibold text-brand-900">
+                      {selectedStudent.personalDetails.studentName}
+                    </p>
+                    <p>{selectedStudent.studentId}</p>
+                  </div>
+                  <p>
+                    Class: {selectedStudent.academicDetails.className} -{" "}
+                    {selectedStudent.academicDetails.section}
+                  </p>
+                  <p>Admission Date: {formatDate(selectedStudent.academicDetails.admissionDate)}</p>
+                  <p>Father: {selectedStudent.personalDetails.fatherName}</p>
+                  <p>Mother: {selectedStudent.personalDetails.motherName}</p>
+                  <p>Aadhar: {selectedStudent.personalDetails.aadharNumber}</p>
+                  <p className="capitalize">Facility: {selectedStudent.facilityType}</p>
+                  <p>Phone: {selectedStudent.contactDetails.phoneNumber}</p>
+                  <p>Address: {selectedStudent.contactDetails.address}</p>
+                  <p>Total Paid: {formatCurrency(selectedStudent.feeSummary.totalPaid)}</p>
+                  <p>Total Due: {formatCurrency(selectedStudent.feeSummary.totalDue)}</p>
+                  <p>Transport Fee: {formatCurrency(selectedStudent.feeSummary.transportFee)}</p>
+                  <p>Hostel Fee: {formatCurrency(selectedStudent.feeSummary.hostelFee)}</p>
+
+                  <div className="rounded-2xl bg-brand-50 p-4">
+                    <p className="font-semibold text-brand-900">Fee History</p>
+                    <div className="mt-3 space-y-3">
+                      {feeHistory.length ? (
+                        feeHistory.map((item) => (
+                          <div
+                            key={item._id}
+                            className="rounded-2xl border border-brand-100 bg-white px-4 py-3"
+                          >
+                            <div className="flex flex-col gap-1 text-sm">
+                              <span className="capitalize">{item.entryKind}</span>
+                              <span>{item.receiptId || "Due Entry"}</span>
+                              <span>{formatDate(item.paymentDate)}</span>
+                              <span>{formatCurrency(item.amount)}</span>
+                              {item.pdfPath ? (
+                                <a
+                                  className="text-brand-700 underline"
+                                  href={getAssetUrl(item.pdfPath)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Open Receipt
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p>No fee history yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-brand-700">
+                  Choose a student from the list to view full details and payment records.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+      ) : (
+        <section className="panel p-6 md:p-8">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
                 <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-accent-600">
                   Personal Details
                 </p>
@@ -526,76 +619,9 @@ const StudentsPage = () => {
                   Reset
                 </button>
               </div>
-            </form>
-          </div>
-
-          <div className="panel p-6">
-            <h3 className="font-display text-2xl text-brand-900">Student Details</h3>
-            {selectedStudent ? (
-              <div className="mt-5 space-y-4 text-sm text-brand-700">
-                <div>
-                  <p className="font-semibold text-brand-900">
-                    {selectedStudent.personalDetails.studentName}
-                  </p>
-                  <p>{selectedStudent.studentId}</p>
-                </div>
-                <p>
-                  Class: {selectedStudent.academicDetails.className} -{" "}
-                  {selectedStudent.academicDetails.section}
-                </p>
-                <p>Admission Date: {formatDate(selectedStudent.academicDetails.admissionDate)}</p>
-                <p>Father: {selectedStudent.personalDetails.fatherName}</p>
-                <p>Mother: {selectedStudent.personalDetails.motherName}</p>
-                <p>Aadhar: {selectedStudent.personalDetails.aadharNumber}</p>
-                <p className="capitalize">Facility: {selectedStudent.facilityType}</p>
-                <p>Phone: {selectedStudent.contactDetails.phoneNumber}</p>
-                <p>Address: {selectedStudent.contactDetails.address}</p>
-                <p>Total Paid: {formatCurrency(selectedStudent.feeSummary.totalPaid)}</p>
-                <p>Total Due: {formatCurrency(selectedStudent.feeSummary.totalDue)}</p>
-                <p>Transport Fee: {formatCurrency(selectedStudent.feeSummary.transportFee)}</p>
-                <p>Hostel Fee: {formatCurrency(selectedStudent.feeSummary.hostelFee)}</p>
-
-                <div className="rounded-2xl bg-brand-50 p-4">
-                  <p className="font-semibold text-brand-900">Fee History</p>
-                  <div className="mt-3 space-y-3">
-                    {feeHistory.length ? (
-                      feeHistory.map((item) => (
-                        <div
-                          key={item._id}
-                          className="rounded-2xl border border-brand-100 bg-white px-4 py-3"
-                        >
-                          <div className="flex flex-col gap-1 text-sm">
-                            <span className="capitalize">{item.entryKind}</span>
-                            <span>{item.receiptId || "Due Entry"}</span>
-                            <span>{formatDate(item.paymentDate)}</span>
-                            <span>{formatCurrency(item.amount)}</span>
-                            {item.pdfPath ? (
-                              <a
-                                className="text-brand-700 underline"
-                                href={getAssetUrl(item.pdfPath)}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Open Receipt
-                              </a>
-                            ) : null}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No fee history yet.</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm text-brand-700">
-                Choose a student from the list to view full details and payment records.
-              </p>
-            )}
-          </div>
+          </form>
         </section>
-      </div>
+      )}
     </div>
   );
 };

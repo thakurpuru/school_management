@@ -20,7 +20,9 @@ const App = () => (
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="students" element={<StudentsPage />} />
+        <Route path="students" element={<Navigate to="/admin/students/list" replace />} />
+        <Route path="students/list" element={<StudentsPage mode="list" />} />
+        <Route path="students/add" element={<StudentsPage mode="form" />} />
         <Route path="fees" element={<FeesPage />} />
         <Route path="fee-structure" element={<FeeStructurePage />} />
         <Route path="teachers" element={<TeachersPage />} />
